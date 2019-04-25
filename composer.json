@@ -1,0 +1,20 @@
+{
+    "name": "benjaminferge/event-sourcing",
+    "description": "Event sourcing library.",
+    "type": "library",
+    "license": "LGPL",
+    "authors": [
+        {
+            "name": "Benjamin J. Ferge",
+            "email": "benjamin.ferge17@gmail.com"
+        }
+    ],
+    "require": {
+        "ramsey/uuid": "^3.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "EventSourcing\\": "src/"
+        }
+    }
+}
