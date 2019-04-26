@@ -14,7 +14,7 @@ use Ramsey\Uuid\UuidInterface;
 class EventStore
 {
     private $pdo;
-    private $projectors;
+    private $projectors = [];
 
     private const CREATE_TABLE_EVENTS = <<<SQL
 CREATE TABLE IF NOT EXISTS events (
