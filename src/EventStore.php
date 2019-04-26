@@ -153,8 +153,8 @@ SQL;
         }
 
         $ins_event = <<<SQL
-            INSERT INTO events (stream_id, type, payload, version, occured_at)
-            VALUES (:streamId, :type, :jsonPayload, :expectedVersion, :occuredAt)
+            INSERT INTO events (id, stream_id, type, payload, version, occured_at)
+            VALUES (:eventId, :streamId, :type, :jsonPayload, :expectedVersion, :occuredAt)
 SQL;
 
         $stmt = $this->pdo->prepare($ins_event);
@@ -162,8 +162,9 @@ SQL;
         $event->setRecordedAt(microtime(true));
         $recordedAt = $event->getRecordedAt();
         $jsonPayload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        $eventId = $event->getId();
         $stmt->execute(
-            compact("streamId", "type", "jsonPayload", "expectedVersion", "occuredAt")
+            compact("eventId", "streamId", "type", "jsonPayload", "expectedVersion", "occuredAt")
         );
 
         $nextVersion = $streamVersion + 1;
