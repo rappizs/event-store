@@ -79,12 +79,31 @@ SQL;
         return $stream;
     }
 
-    public function loadStream(UuidInterface $id)
+    public function getStream(UuidInterface $id)
     {
         $qry = "SELECT * FROM streams WHERE id = ?";
         $stmt = $this->pdo->prepare($qry);
         $result = $stmt->execute([$id]);
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $this->loadStream($row);
+    }
+    
+    public function getStreamsForType(string $type)
+    {
+        $qry = "SELECT * FROM streams WHERE type = ?";
+        $stmt = $this->pdo->prepare($qry);
+        $result = $stmt->execute([$type]);
+        
+        $streams = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
+        {
+            $streams[] = $this->loadStream($row);
+        }
+        return $streams;
+    }
+
+    private function loadStream($row)
+    {
         $stream = new EventStream(
             Uuid::fromString($row["id"]),
             $row["type"],
@@ -95,7 +114,7 @@ SQL;
         
         $qry = "SELECT * FROM events WHERE stream_id = ?";
         $stmt = $this->pdo->prepare($qry);
-        $result = $stmt->execute([$id]);
+        $result = $stmt->execute([$row["id"]]);
 
         if (!$result) {
         }
