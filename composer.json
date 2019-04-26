@@ -1,5 +1,5 @@
 {
-    "name": "benjaminferge/event-sourcing",
+    "name": "benjaminferge/event-store",
     "description": "Event sourcing library.",
     "type": "library",
     "license": "LGPL",
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "EventSourcing\\": "src/"
+            "EventStore\\": "src/"
         }
     }
 }
