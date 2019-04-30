@@ -24,11 +24,11 @@ class Projector
     /**
      * Creates a projector for an event stream.
      *
-     * @param ProjectionInterface $projection
+     * @param Projection $projection
      * @param array $state Initial state.
      * @param array $eventStream If empty array is provided then project for every stream.
      */
-    public function __construct(ProjectionInterface $projection, EventStream $eventStream, array $state = []) {
+    public function __construct(Projection $projection, EventStream $eventStream, array $state = []) {
         $this->projection = $projection;
         $this->position = 0;
         $this->status = self::STATUS_READY;

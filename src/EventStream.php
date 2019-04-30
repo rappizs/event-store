@@ -33,7 +33,7 @@ class EventStream
         $this->events = [];
     }
 
-    public function addEvent(EventInterface $event)
+    public function addEvent(Event $event)
     {
         $this->events[] = $event;
     }

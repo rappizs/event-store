@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EventStore;
 
-interface ProjectionInterface
+interface Projection
 {
     public function handle(array $state, Event $e): array;
 }

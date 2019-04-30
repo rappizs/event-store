@@ -135,7 +135,7 @@ SQL;
         return $stream;
     }
 
-    public function push(UuidInterface $streamId, EventInterface $event)
+    public function push(UuidInterface $streamId, Event $event)
     {
         $type = $event->getType();
         $payload = $event->getPayload();
@@ -181,7 +181,7 @@ SQL;
         return $event;
     }
 
-    private function publish(EventInterface $e)
+    private function publish(Event $e)
     {
         foreach ($this->projectors as $p) {
             $p->project($e);

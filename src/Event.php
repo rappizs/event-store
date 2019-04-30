@@ -14,7 +14,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Represents each changes of the application state.
  */
-class Event implements EventInterface
+class Event
 {
     private $id;
     private $streamId;
