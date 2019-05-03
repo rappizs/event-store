@@ -172,6 +172,7 @@ SQL;
         $stmt = $this->pdo->prepare($update_stream);
         $stmt->execute(compact("nextVersion", "streamId"));
 
+        $this->publish($event);
         return $event;
     }
 
@@ -186,6 +187,18 @@ SQL;
         } catch (\PDOException $ex) {
             $this->pdo->rollBack();
             throw $ex;
+        }
+    }
+
+    public function addProjector(Projector $projector): void
+    {
+        $this->projectors[] = $projector;
+    }
+
+    private function publish(Event $e): void
+    {
+        foreach ($this->projectors as $p) {
+            $p->project($e);
         }
     }
 }

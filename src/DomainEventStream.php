@@ -18,6 +18,7 @@ class DomainEventStream implements EventStream
     private $createdAt;
     private $updatedAt;
     private $events;
+    private $projectors = [];
 
     public function __construct(
         UuidInterface $id,
