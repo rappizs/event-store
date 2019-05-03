@@ -14,7 +14,6 @@ use Ramsey\Uuid\UuidInterface;
 class EventStore
 {
     private $pdo;
-    private $projectors = [];
 
     private const CREATE_TABLE_EVENTS = <<<SQL
 CREATE TABLE IF NOT EXISTS events (
@@ -51,11 +50,6 @@ SQL;
             \PDO::ATTR_ERRMODE,
             \PDO::ERRMODE_EXCEPTION
         );
-    }
-
-    public function addProjector(Projector $projector)
-    {
-        $this->projectors[] = $projector;
     }
 
     public function createStream($type)
@@ -177,15 +171,7 @@ SQL;
         $stmt = $this->pdo->prepare($update_stream);
         $stmt->execute(compact("nextVersion", "streamId"));
 
-        $this->publish($event);
         return $event;
-    }
-
-    private function publish(Event $e)
-    {
-        foreach ($this->projectors as $p) {
-            $p->project($e);
-        }
     }
 
     public function ensureTables()
