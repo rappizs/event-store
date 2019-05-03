@@ -139,7 +139,7 @@ SQL;
     {
         $type = $event->getType();
         $payload = $event->getPayload();
-        $expectedVersion = $event->getVersion();
+        $expectedVersion = $event->getVersion() - 1;
         $select_version = <<<SQL
             SELECT version FROM streams
             WHERE id = :streamId
