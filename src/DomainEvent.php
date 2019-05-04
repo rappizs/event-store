@@ -85,4 +85,17 @@ class DomainEvent implements Event
     {
         $this->recordedAt = $recordedAt;
     }
+
+    public function toJson(): string
+    {
+        return json_encode([
+            "id" => $this->id,
+            "streamId" => $this->streamId,
+            "type" => $this->type,
+            "payload" => $this->payload,
+            "version" => $this->version,
+            "occuredAt" => $this->occuredAt,
+            "recordedAt" => $this->recordedAt,
+        ]);
+    }
 }

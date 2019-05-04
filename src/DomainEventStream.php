@@ -34,7 +34,7 @@ class DomainEventStream implements EventStream
         $this->events = [];
     }
 
-    public function addEvent(EventInterface $event): void
+    public function addEvent(Event $event): void
     {
         $this->events[] = $event;
     }
@@ -64,7 +64,7 @@ class DomainEventStream implements EventStream
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): float
+    public function getUpdatedAt(): ?float
     {
         return $this->updatedAt;
     }
@@ -72,5 +72,17 @@ class DomainEventStream implements EventStream
     public function getEvents(): array
     {
         return $this->events;
+    }
+
+    public function toJson(): string
+    {
+        return json_encode([
+            "id" => $this->id,
+            "type" => $this->type,
+            "version" => $this->version,
+            "createdAt" => $this->createdAt,
+            "updatedAt" => $this->updatedAt,
+            "events" => $this->events,
+        ]);
     }
 }

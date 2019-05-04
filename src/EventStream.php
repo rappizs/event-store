@@ -12,12 +12,13 @@ use Ramsey\Uuid\UuidInterface;
 
 interface EventStream
 {
-    public function addEvent(EventInterface $event): void;
+    public function addEvent(Event $event): void;
     public function addEventRange(array $events): void;
     public function getId(): UuidInterface;
     public function getType(): string;
     public function getVersion(): int;
     public function getCreatedAt(): float;
-    public function getUpdatedAt(): float;
+    public function getUpdatedAt(): ?float;
     public function getEvents(): array;
+    public function toJson(): string;
 }

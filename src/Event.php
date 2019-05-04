@@ -21,4 +21,5 @@ interface Event
     public function getOccuredAt(): float;
     public function getRecordedAt(): float;
     public function setRecordedAt(float $t): void;
+    public function toJson(): string;
 }

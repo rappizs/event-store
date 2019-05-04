@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c1d672d357640906fc1efb1a8fb7d08",
+    "content-hash": "c79add979558e79ef5545503afe7d70d",
     "packages": [
         {
             "name": "paragonie/random_compat",
@@ -178,7 +178,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "backendtea@gmail.com"
+                    "email": "BackEndTea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
