@@ -10,5 +10,5 @@ namespace EventStore;
 
 interface Projection
 {
-    public function handle(array $state, Event $e): array;
+    public function handle($state, Event $e);
 }
