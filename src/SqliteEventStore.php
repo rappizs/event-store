@@ -14,6 +14,7 @@ use Ramsey\Uuid\UuidInterface;
 class SqliteEventStore implements EventStore
 {
     private $pdo;
+    private $projectors = [];
 
     private const CREATE_TABLE_EVENTS = <<<SQL
 CREATE TABLE IF NOT EXISTS events (
