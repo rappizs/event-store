@@ -79,14 +79,14 @@ SQL;
         }
 
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $events = $this->getEventsByStream($id);
         $stream = new EventStream(
             Uuid::fromString($row['id']), 
             $row['type'], 
             (int) $row['version'], 
-            (float) $row['created_at']
+            (float) $row['created_at'],
+            $events
         );
-        $events = $this->getEventsByStream($id);
-        $stream->addEventRange($events);
         return $stream;
     }
 
@@ -143,19 +143,23 @@ SQL;
     {
         $sql = <<<SQL
             INSERT INTO events (id, stream_id, type, payload, version, occured_at)
-            VALUES (:eventId, :streamId, :type, :jsonPayload, :expectedVersion, :occuredAt)
+            VALUES (:eventId, :streamId, :type, :jsonPayload, :version, :occuredAt)
 SQL;
 
         $stmt = $this->pdo->prepare($sql);
-        $occuredAt = $event->getOccuredAt();
-        $event->setRecordedAt(microtime(true));
-        $recordedAt = $event->getRecordedAt();
-        $payload = $event->getPayload();
+        $occuredAt = $event->occuredAt;
+        $event->recordedAt = microtime(true);
+        $recordedAt = $event->recordedAt;
+        $payload = $event->payload;
         $jsonPayload = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-        $eventId = $event->getId();
+        $eventId = $event->id;
+        $streamId = $event->streamId;
+        $type = $event->type;
+        $version = $event->version;
         $stmt->execute(
-            compact("eventId", "streamId", "type", "jsonPayload", "expectedVersion", "occuredAt")
+            compact("eventId", "streamId", "type", "jsonPayload", "version", "occuredAt")
         );
+        return $event;
     }
 
     public function incrementStream($streamId, $nextVersion)

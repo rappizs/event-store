@@ -45,15 +45,15 @@ class EventStore
 
     public function push(UuidInterface $streamId, Event $event): Event
     {
-        $event->setStreamId($streamId);
-        $expectedVersion = $event->getVersion() - 1;
+        $event->streamId = $streamId;
+        $expectedVersion = $event->version - 1;
         $streamVersion = $this->repo->getVersionForStream($streamId);
 
         if ($streamVersion !== $expectedVersion) {
             throw new ConcurrencyException("StreamVersion ($streamVersion) is not equal with ExpectedVersion ($expectedVersion)");
         }
 
-        $this->repo->push($event);
+        $event = $this->repo->push($event);
 
         $nextVersion = $streamVersion + 1;
 
