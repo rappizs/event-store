@@ -91,7 +91,7 @@ SQL;
         return $stream;
     }
 
-    public function getStreamsForType(string $type): array
+    public function getStreamsByType(string $type): array
     {
         $qry = "SELECT * FROM streams WHERE type = ?";
         $stmt = $this->pdo->prepare($qry);

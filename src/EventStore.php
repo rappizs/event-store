@@ -38,9 +38,9 @@ class EventStore
         return $this->repo->getStream($id);
     }
     
-    public function getStreamsForType(string $type): array
+    public function getStreamsByType(string $type): array
     {
-        return $this->repo->getStreamsForType($type);
+        return $this->repo->getStreamsByType($type);
     }
 
     public function push(UuidInterface $streamId, Event $event): Event
