@@ -51,7 +51,8 @@ SQL;
     public function createStream($type): EventStream
     {
         $version = 0;
-        $createdAt = microtime(true);
+        // ? Generated 6 decimals but saves only 4
+        $createdAt = round(microtime(true), 4);
         $streamId = Uuid::uuid4();
         $sql = <<<SQL
             INSERT INTO streams (id, type, version, created_at, updated_at)
@@ -72,7 +73,7 @@ SQL;
     {
         $qry = "SELECT * FROM streams WHERE id = ?";
         $stmt = $this->pdo->prepare($qry);
-        $result = $stmt->execute($id);
+        $result = $stmt->execute([$id]);
 
         if (!$result) {
             // TODO: throw exception
@@ -99,7 +100,7 @@ SQL;
         $streams = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
         {
-            $streams[] = $this->getStream($row['id']);
+            $streams[] = $this->getStream(Uuid::fromString($row['id']));
         }
         return $streams;
     }

@@ -75,4 +75,13 @@ final class EventStoreTest extends TestCase
         $event = new Event($type, $payload, -20);
         $eventStore->push($stream->id, $event);
     }
+
+    public function test_can_get_streams_by_type()
+    {
+        $eventStore = new EventStore();
+        $type = 'User';
+        $testStream = $eventStore->createStream($type);
+        $streams = $eventStore->getStreamsForType($type);
+        $this->assertEquals($testStream->createdAt, $streams[0]->createdAt);
+    }
 }
