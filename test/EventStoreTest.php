@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use EventStore\EventStore;
 use EventStore\Event;
 use Ramsey\Uuid\UuidInterface;
+use EventStore\ConcurrencyException;
 
 final class EventStoreTest extends TestCase
 {
@@ -50,5 +51,28 @@ final class EventStoreTest extends TestCase
         $this->assertSame($payload, $_event->payload);
         $this->assertSame($version, $_event->version);
         $this->assertSame($type, $_event->type);
+    }
+
+    public function test_concurrency_exception()
+    {
+        $this->expectException(ConcurrencyException::class);
+        $eventStore = new EventStore();
+        $stream = $eventStore->createStream('TestStream');
+        $payload = ['data' => 100];
+        $type = 'TestEvent';
+        $event = new Event($type, $payload, 1);
+        $eventStore->push($stream->id, $event);
+        $eventStore->push($stream->id, $event);
+    }
+
+    public function test_can_not_push_event_with_wrong_version()
+    {
+        $this->expectException(ConcurrencyException::class);
+        $eventStore = new EventStore();
+        $stream = $eventStore->createStream('TestStream');
+        $payload = ['data' => 100];
+        $type = 'TestEvent';
+        $event = new Event($type, $payload, -20);
+        $eventStore->push($stream->id, $event);
     }
 }
