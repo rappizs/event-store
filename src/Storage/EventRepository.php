@@ -25,6 +25,7 @@ abstract class EventRepository
     abstract public function getStream(UuidInterface $id): EventStream;
     abstract public function getEventsByStream(UuidInterface $id): array;
     abstract public function getStreamsByType(string $type): array;
+    abstract public function getEvents(): array;
     abstract public function createStream($type): EventStream;
     abstract public function getVersionForStream($streamId): int;
     abstract public function push(Event $event);

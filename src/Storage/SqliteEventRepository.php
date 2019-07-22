@@ -105,6 +105,30 @@ SQL;
         return $streams;
     }
 
+    public function getEvents(): array
+    {
+        $qry = "SELECT * FROM events";
+        $stmt = $this->pdo->prepare($qry);
+
+        // TODO: Error checking
+        $result = $stmt->execute();
+        
+        $events = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
+        {
+            $events[] = new Event(
+                $row['type'], 
+                json_decode($row['payload'], true), 
+                (int) $row['version'], 
+                Uuid::fromString($row['id']), 
+                Uuid::fromString($row['stream_id']), 
+                (float) $row['occured_at'], 
+                (float) $row['recorded_at']
+            );
+        }
+        return $events;
+    }
+
     public function getVersionForStream($streamId): int
     {
         $sql = <<<SQL

@@ -67,6 +67,14 @@ class EventStore
         $this->projectors[] = $projector;
     }
 
+    public function replayAll()
+    {
+        $events = $this->repo->getEvents();
+        foreach ($events as $e) {
+            $this->publish($e);
+        }
+    }
+
     private function publish(Event $e): void
     {
         foreach ($this->projectors as $p) {
