@@ -45,7 +45,7 @@ class Projector
         if ($this->verbose) {
             echo "Projecting ".$e->getType()."\n";
         }
-        $this->eventStream->addEvent($e);
+        $this->eventStream->events[] = $e;
         $this->state = $this->projection->handle($this->state, $e);
         $this->position++;
     }
