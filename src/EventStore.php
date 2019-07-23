@@ -13,7 +13,7 @@ use EventStore\Storage\SqliteEventRepository;
 
 class EventStore
 {
-    private $projectors = [];
+    private $projections = [];
     private $repo;
 
     public function __construct($filename = ":memory:")
@@ -62,24 +62,55 @@ class EventStore
         return $event;
     }
 
-    public function addProjector(Projector $projector): void
+    public function addProjection(Projection $projection): void
     {
-        $this->projectors[] = $projector;
+        $this->projections[$projection->getEventStream()->id] = $projection;
     }
 
     public function replayAll()
     {
         $events = $this->repo->getEvents();
         foreach ($events as $e) {
-            $this->publish($e, false);
+            $this->publish($e);
         }
     }
 
-    private function publish(Event $e, bool $populate = true): void
+    public function runProjection(Projection $projection)
     {
-        foreach ($this->projectors as $p) {
-            if ($e->streamId == $p->getEventStream()->id)
-                $p->project($e, $populate);
+        // TODO: Custom Exception class
+        if ($projection->getStreamId() === null && $projection->getStreamType() === null) {
+            throw new \Exception("Cannot StreamId and StreamType both be null. Please set only one of them.");
+        }
+        if ($projection->getStreamId() !== null && $projection->getStreamType() !== null) {
+            throw new \Exception("Cannot StreamId and StreamType both be set. Please set only one of them.");
+        }
+        if ($projection->getStreamId() !== null) {
+            foreach ($this->repo->getEvents($projection->getStreamId()) as $e) {
+                ($projection)($e);
+            }
+            return $projection->getState();     
+        }
+        $results = [];
+        $streams = $this->getStreamsByType($projection->getStreamType());
+        foreach ($streams as $s) {
+            $_projection = clone $projection;
+            foreach($s->events as $e) {
+                ($_projection)($e);
+            }
+            $results[(string) $s->id] = $_projection->getState();
+        }
+        return $results;
+    }
+
+    private function publish(Event $e): void
+    {
+        $streamId = (string) $e->streamId;
+        if (!isset($this->projections[$streamId])) {
+            // TODO: notice user
+            return;
+        }
+        foreach ($this->projections[$streamId] as $p) {
+            ($p)($e);
         }
     }
 }

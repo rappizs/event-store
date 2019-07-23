@@ -32,6 +32,6 @@ class EventStream
         $this->version = $version;
         $this->createdAt = $createdAt;
         $this->updatedAt = null;
-        $this->events = [];
+        $this->events = $events;
     }
 }
