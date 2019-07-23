@@ -78,7 +78,8 @@ class EventStore
     private function publish(Event $e, bool $populate = true): void
     {
         foreach ($this->projectors as $p) {
-            $p->project($e, $populate);
+            if ($e->streamId == $p->getEventStream()->id)
+                $p->project($e, $populate);
         }
     }
 }
