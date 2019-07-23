@@ -71,14 +71,14 @@ class EventStore
     {
         $events = $this->repo->getEvents();
         foreach ($events as $e) {
-            $this->publish($e);
+            $this->publish($e, false);
         }
     }
 
-    private function publish(Event $e): void
+    private function publish(Event $e, bool $populate = true): void
     {
         foreach ($this->projectors as $p) {
-            $p->project($e);
+            $p->project($e, $populate);
         }
     }
 }

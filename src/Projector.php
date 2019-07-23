@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace EventStore;
 
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
+
 class Projector
 {
     const STATUS_OK = 0;
@@ -17,6 +20,7 @@ class Projector
 
     const VERBOSE = 1;
 
+    private $id;
     private $projection;
     private $position;
     private $status;
@@ -31,21 +35,33 @@ class Projector
      * @param $state Initial state.
      * @param array $eventStream If empty array is provided then project for every stream.
      */
-    public function __construct(Projection $projection, EventStream $eventStream, $state = null, int $position = 0, int $options = null) {
+    public function __construct(Projection $projection, EventStream $eventStream, $id = null, $state = null, int $position = 0, int $options = null) {
         $this->projection = $projection;
         $this->position = $position;
         $this->status = self::STATUS_READY;
+        $this->id = $id ?? Uuid::uuid4();
         $this->state = $state;
         $this->eventStream = $eventStream;
         $this->verbose = $options & self::VERBOSE;
     }
 
-    public function project(Event $e)
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
+
+    public function getProjectionName(): string
+    {
+        get_class($this->projection);
+    }
+
+    public function project(Event $e, bool $populate)
     {
         if ($this->verbose) {
             echo "Projecting ".$e->getType()."\n";
         }
-        $this->eventStream->events[] = $e;
+        if ($populate)
+            $this->eventStream->events[] = $e;
         $this->state = $this->projection->handle($this->state, $e);
         $this->position++;
     }
