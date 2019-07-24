@@ -30,6 +30,7 @@ class Projection
     private $verbose;
     private $handlers = [];
     private $streamType;
+    private $separate = false;
 
     /**
      * Creates a projection for an event stream.
@@ -97,7 +98,7 @@ class Projection
     {
         return $this->streamId;
     }
-
+    
     public function getPosition()
     {
         return $this->position;
@@ -108,21 +109,30 @@ class Projection
         return $this->streamType;
     }
 
-    public static function init(array $state)
+    public function isSeparate(): bool
     {
-        return (new self)->setState($state);
+        return $this->separate;
     }
 
-    public function fromType(string $streamType)
+    public static function fromType(string $streamType)
     {
-        $this->streamType = $streamType;
-        return $this;
+        $self = new self;
+        $self->streamType = $streamType;
+        return $self;
     }
 
-    public function fromStream(UuidInterface $streamId)
+    public static function fromStream(UuidInterface $streamId)
     {
-        $this->streamId = $streamId;
-        return $this;
+        $self = new self;
+        $self->streamId = $streamId;
+        return $self;
+    }
+
+    public static function fromEach(string $streamType)
+    {
+        $self = self::fromType($streamType);
+        $self->separate = true;
+        return $self;
     }
 
     public function on(string $eventType, callable $handler)
@@ -131,8 +141,9 @@ class Projection
         return $this;
     }
 
-    public function exec(EventStore $eventStore)
+    public function exec(EventStore $eventStore, array $initState = [])
     {
+        $this->setState($initState);
         return $eventStore->runProjection($this);
     }
 

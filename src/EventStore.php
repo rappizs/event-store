@@ -77,29 +77,36 @@ class EventStore
 
     public function runProjection(Projection $projection)
     {
-        // TODO: Custom Exception class
-        if ($projection->getStreamId() === null && $projection->getStreamType() === null) {
-            throw new \Exception("Cannot StreamId and StreamType both be null. Please set only one of them.");
-        }
-        if ($projection->getStreamId() !== null && $projection->getStreamType() !== null) {
-            throw new \Exception("Cannot StreamId and StreamType both be set. Please set only one of them.");
-        }
+        // By StreamId
         if ($projection->getStreamId() !== null) {
             foreach ($this->repo->getEvents($projection->getStreamId()) as $e) {
                 ($projection)($e);
             }
             return $projection->getState();     
         }
-        $results = [];
+
+        // By StreamType and separately
+        if ($projection->isSeparate()) {
+            $results = [];
+            $streams = $this->getStreamsByType($projection->getStreamType());
+            foreach ($streams as $s) {
+                $_projection = clone $projection;
+                foreach($s->events as $e) {
+                    ($_projection)($e);
+                }
+                $results[(string) $s->id] = $_projection->getState();
+            }
+            return $results;
+        }
+
+        // By StreamType
         $streams = $this->getStreamsByType($projection->getStreamType());
         foreach ($streams as $s) {
-            $_projection = clone $projection;
             foreach($s->events as $e) {
-                ($_projection)($e);
+                ($projection)($e);
             }
-            $results[(string) $s->id] = $_projection->getState();
         }
-        return $results;
+        return $projection->getState();
     }
 
     private function publish(Event $e): void
