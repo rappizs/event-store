@@ -37,6 +37,11 @@ class EventStore
     {
         return $this->repo->getStream($id);
     }
+
+    public function getStreams(): array
+    {
+        return $this->repo->getStreams();
+    }
     
     public function getStreamsByType(string $type): array
     {

@@ -80,15 +80,35 @@ SQL;
         }
 
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $events = $this->getEventsByStream($id);
+        $stream = $this->parseStreamFromRow($row);
+        return $stream;
+    }
+
+    private function parseStreamFromRow($row)
+    {
+        $id = Uuid::fromString($row['id']);
         $stream = new EventStream(
-            Uuid::fromString($row['id']), 
+            $id, 
             $row['type'], 
             (int) $row['version'], 
             (float) $row['created_at'],
-            $events
+            $this->getEventsByStream($id)
         );
         return $stream;
+    }
+
+    public function getStreams(): array
+    {
+        $qry = "SELECT * FROM streams";
+        $stmt = $this->pdo->prepare($qry);
+        $result = $stmt->execute();
+        
+        $streams = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
+        {
+            $streams[] = $this->parseStreamFromRow($row);
+        }
+        return $streams;
     }
 
     public function getStreamsByType(string $type): array
@@ -100,7 +120,7 @@ SQL;
         $streams = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC))
         {
-            $streams[] = $this->getStream(Uuid::fromString($row['id']));
+            $streams[] = $this->parseStreamFromRow($row);
         }
         return $streams;
     }
