@@ -75,7 +75,7 @@ class EventStore
         }
     }
 
-    public function runProjection(Projection $projection)
+    public function exec(Projection $projection)
     {
         // By StreamId
         if ($projection->getStreamId() !== null) {

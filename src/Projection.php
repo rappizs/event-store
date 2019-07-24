@@ -141,10 +141,15 @@ class Projection
         return $this;
     }
 
-    public function exec(EventStore $eventStore, array $initState = [])
+    public function init(array $initState = [])
     {
-        $this->setState($initState);
-        return $eventStore->runProjection($this);
+        $this->state = $initState;
+        return $this;
+    }
+
+    public function exec(EventStore $eventStore)
+    {
+        return $eventStore->exec($this);
     }
 
     public function getHandlers()
