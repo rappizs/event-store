@@ -14,6 +14,7 @@ use EventStore\Storage\SqliteEventRepository;
 class EventStore
 {
     private $projections = [];
+    private $typeProjections = [];
     private $repo;
 
     public function __construct($filename = ":memory:")
@@ -72,6 +73,14 @@ class EventStore
         $this->projections[$projection->getEventStream()->id] = $projection;
     }
 
+    public function addTypeProjection(string $type, Projection $projection): void
+    {
+        if (!isset($this->typeProjections[$type])) {
+            $this->typeProjections[$type] = [];
+        }
+        $this->typeProjections[$type][] = $projection;
+    }
+
     public function replayAll()
     {
         $events = $this->repo->getEvents();
@@ -87,7 +96,7 @@ class EventStore
             foreach ($this->repo->getEvents($projection->getStreamId()) as $e) {
                 ($projection)($e);
             }
-            return $projection->getState();     
+            return $projection->getState();
         }
 
         // By StreamType and separately
@@ -96,7 +105,7 @@ class EventStore
             $streams = $this->getStreamsByType($projection->getStreamType());
             foreach ($streams as $s) {
                 $_projection = clone $projection;
-                foreach($s->events as $e) {
+                foreach ($s->events as $e) {
                     ($_projection)($e);
                 }
                 $results[(string) $s->id] = $_projection->getState();
@@ -107,7 +116,7 @@ class EventStore
         // By StreamType
         $streams = $this->getStreamsByType($projection->getStreamType());
         foreach ($streams as $s) {
-            foreach($s->events as $e) {
+            foreach ($s->events as $e) {
                 ($projection)($e);
             }
         }
@@ -116,13 +125,25 @@ class EventStore
 
     private function publish(Event $e): void
     {
+        $stream = $this->getStream($e->streamId);
+        $streamType = $stream->type;
         $streamId = (string) $e->streamId;
-        if (!isset($this->projections[$streamId])) {
-            // TODO: notice user
-            return;
+        $hasStreamProjection = false;
+        $hasTypeProjection = false;
+        if (isset($this->projections[$streamId])) {
+            $hasStreamProjection = true;
+            foreach ($this->projections[$streamId] as $p) {
+                ($p)($e);
+            }
         }
-        foreach ($this->projections[$streamId] as $p) {
-            ($p)($e);
+        if (isset($this->typeProjections[$streamType])) {
+            $hasTypeProjection = true;
+            foreach ($this->typeProjections[$streamType] as $p) {
+                ($p)($e);
+            }
+        }
+        if (!$hasStreamProjection || !$hasTypeProjection) {
+            // TODO: Notice user
         }
     }
 }
