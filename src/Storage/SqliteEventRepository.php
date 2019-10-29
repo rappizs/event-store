@@ -13,7 +13,7 @@ use EventStore\EventStream;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-class SqliteEventRepository extends EventRepository
+class SqliteEventRepository extends PdoEventRepository
 {
     private const CREATE_TABLE_EVENTS = <<<SQL
     CREATE TABLE IF NOT EXISTS events (
