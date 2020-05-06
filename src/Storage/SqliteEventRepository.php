@@ -157,6 +157,14 @@ SQL;
         $stmt->execute([(string) $eventId]);
     }
 
+    public function deleteStream($streamId)
+    {
+        $qry = "DELETE FROM streams WHERE id = ?";
+        $stmt = $this->pdo->prepare($qry);
+
+        $stmt->execute([(string) $streamId]);
+    }
+
     public function getVersionForStream($streamId): int
     {
         $sql = <<<SQL

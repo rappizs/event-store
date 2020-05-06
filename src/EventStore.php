@@ -81,6 +81,15 @@ class EventStore
         }
     }
 
+    public function deleteStream(UuidInterface $streamId)
+    {
+        $stream = $this->repo->getStream($streamId);
+
+        if ($stream->version == 0) {
+            $this->repo->deleteStream((string) $stream->id);
+        }
+    }
+
     public function addProjection(Projection $projection): void
     {
         $this->projections[$projection->getEventStream()->id] = $projection;
